@@ -21,10 +21,6 @@ app.use((req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-  res.send('hello');
-});
-
-app.get('/stuff', (req, res) => {
   res.json(db.stuff());
 });
 
