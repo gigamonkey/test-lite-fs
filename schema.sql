@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS stuff (tag TEXT, number INTEGER);
