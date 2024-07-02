@@ -16,6 +16,10 @@ primary_region = "sjc"
   min_machines_running = 0
   processes = ["app"]
 
+[mounts]
+  source = "gtlfs"
+  destination = "/data"
+
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
