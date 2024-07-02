@@ -37,13 +37,15 @@ app.post('/',  (req, res) => {
   console.log(req.body);
   db.insertStuff(req.body);
   if (Math.random() < 0.1) {
+    console.log(`Sending 500 after saving ${JSON.stringify(req.body)}`);
+    res.status(500).send('Ooops!');
+  } else if (Math.random() < 0.1) {
     console.log(`Crashing after saving ${JSON.stringify(req.body)}`);
     process.exit(1);
+  } else {
+    res.json(req.body);
   }
-  res.json(req.body);
 });
-
-
 
 const line = '********************************************************************************';
 
