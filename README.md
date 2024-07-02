@@ -38,7 +38,7 @@ and what the response code was or error if no response is returned.
 The server handles requests and on the write path, with some probability, exits
 after writing to the database. Assuming no *other* crashes that means all writes
 should go to the database and if everything works as expected a new server will
-take over as the primary and we (mostly) won’t any data.
+take over as the primary and we (mostly) won’t lose any data.
 
 - Style 1: Server exits before sending a response. From the client’s point of
   view we don’t know what happened to that write.
