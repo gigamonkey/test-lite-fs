@@ -10,7 +10,10 @@
   "author": "peter@gigamonkeys.com",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "fetch-cookie": "^3.0.1",
+    "performance-now": "^2.1.0",
+    "tough-cookie": "^4.1.4"
   },
   "devDependencies": {
     "prettier": "^3.0.0",
