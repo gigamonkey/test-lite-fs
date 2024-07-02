@@ -1,13 +1,13 @@
 {
-  "name": "double-oauth",
+  "name": "test-lite-fs-server",
   "type": "module",
   "version": "1.0.0",
-  "description": "Experiment with using OAuth to connect Google and Github identities",
+  "description": "Server for experiment to test LiteFS reliability",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "peter@gigamonkeys.com",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^9.6.0",

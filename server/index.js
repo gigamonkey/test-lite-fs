@@ -53,6 +53,6 @@ if (process.env.DUMP_ROUTES) {
   fs.writeFileSync('routes.txt', dumpEndpoints().join('\n'));
 }
 
-const port = Number(process.env.PORT);
+const port = Number(process.env.PORT)
 
 app.listen(port, () => console.log(`App is listening on port ${port}\n${line}\n`));

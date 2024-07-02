@@ -2,7 +2,7 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=21.7.3
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Node.js"
 
@@ -14,7 +14,7 @@ ENV NODE_ENV="production"
 
 
 # Throw-away build stage to reduce size of final image
-FROM base as build
+FROM base AS build
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -31,6 +31,8 @@ COPY --link . .
 # Final stage for app image
 FROM base
 
+ARG PORT
+
 # Copy built application
 COPY --from=build /app /app
 
@@ -38,7 +40,9 @@ COPY --from=build /app /app
 RUN mkdir -p /data
 VOLUME /data
 
+EXPOSE ${PORT}
+ENV PORT=${PORT}
+ENV DATABASE_URL="/data/db.db"
+
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-ENV DATABASE_URL="file:///data/sqlite.db"
 CMD [ "node", "index.js" ]

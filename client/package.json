@@ -1,0 +1,19 @@
+{
+  "name": "test-lite-fs-client",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Client for experiment to test LiteFS reliability",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "peter@gigamonkeys.com",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "prettier-plugin-organize-imports": "^3.2.3"
+  }
+}
