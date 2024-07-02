@@ -28,9 +28,7 @@ app.get('/me', (req, res) => {
   res.json(db.me(req.query));
 });
 
-app.post('/',  (req, res) => {
-
-  console.log(req.body);
+app.post('/', (req, res) => {
   db.insertStuff(req.body);
   if (Math.random() < 0.1) {
     console.log(`Sending 500 after saving ${JSON.stringify(req.body)}`);
@@ -63,6 +61,6 @@ if (process.env.DUMP_ROUTES) {
   fs.writeFileSync('routes.txt', dumpEndpoints().join('\n'));
 }
 
-const port = Number(process.env.PORT)
+const port = Number(process.env.PORT);
 
 app.listen(port, () => console.log(`App is listening on port ${port}\n${line}\n`));

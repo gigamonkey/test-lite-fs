@@ -21,12 +21,13 @@ const addStuff = async (tag, number) => {
   try {
     const r = await fetchWithCookies(url, {
       method: 'POST',
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    })
+    });
     status = r.status;
     return r;
   } catch (e) {
+    console.log(e);
     ok = false;
     return undefined;
   } finally {
@@ -37,7 +38,7 @@ const addStuff = async (tag, number) => {
 
 const getMe = async (tag) => {
   return fetchWithCookies(`${url}/me?tag=${tag}`);
-}
+};
 
 const dumpCookies = () => {
   cookies.getCookies(url, { allPaths: true }, (err, cookies) => {
@@ -49,38 +50,54 @@ const dumpCookies = () => {
   });
 };
 
-
-let [ url, tag, num, delay ] = argv.slice(2);
+let [url, tag, num, delay] = argv.slice(2);
 
 num = Number(num);
-delay = Number(delay);
+delay = Number(delay ?? 0);
 
-const start = await getMe(tag).then(r => r.json());
-
-console.log(`Starting at: ${JSON.stringify(start)}`);
-
-const offset = start.max + 1;
-
-const busywait = (ms) => {
-  const start = now();
-  while (now() - start < ms);
-}
-
-for (let i = 0; i < num; i++) {
-  const r = await addStuff(tag, i + offset);
-  process.stdout.write('.');
-  if (i !== 0 && i % 60 === 0) process.stdout.write('\n');
-  if (delay > 0) busywait(delay);
-}
-process.stdout.write('\n');
+console.log(`num: ${num}; delay: ${delay}`);
 
 try {
-  const end = await getMe('a').then(r => r.json());
-  console.log(`Ending at: ${JSON.stringify(end)}`);
-} catch {
-  console.log('Problem at end');
+  const r = await getMe(tag);
+
+  if (r.status === 200) {
+    const start = await r.json();
+
+    console.log(`Starting at: ${JSON.stringify(start)}`);
+
+    const offset = start.max + 1;
+
+    const busywait = (ms) => {
+      const start = now();
+      while (now() - start < ms);
+    };
+
+    for (let i = 0; i < num; i++) {
+      const r = await addStuff(tag, i + offset);
+      process.stdout.write('.');
+      if (i !== 0 && i % 60 === 0) process.stdout.write('\n');
+      if (delay > 0) busywait(delay);
+    }
+    process.stdout.write('\n');
+
+    try {
+      const end = await getMe(tag).then((r) => r.json());
+      console.log(`Ending at: ${JSON.stringify(end)}`);
+    } catch {
+      console.log('Problem at end');
+    }
+
+    //dumpCookies();
+
+    fs.writeFileSync(
+      `client-${tag}-${offset}-${offset + num - 1}.json`,
+      JSON.stringify(requests, null, 2),
+    );
+  } else {
+    console.log(`Couldn't get starting point for tag: ${tag}`);
+    console.log(r);
+  }
+} catch (e) {
+  console.log(`Something went boom!`);
+  console.log(e);
 }
-
-//dumpCookies();
-
-fs.writeFileSync(`client-${tag}-${offset}-${(offset+num) - 1}.json`, JSON.stringify(requests, null, 2));

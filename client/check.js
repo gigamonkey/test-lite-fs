@@ -9,14 +9,14 @@ const fetchWithCookies = fetchCookie(fetch, cookies);
 
 const loadExpected = (file, expected, maybe) => {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-  data.forEach(datum => {
+  data.forEach((datum) => {
     if (datum.ok) {
       expected.add(JSON.stringify(datum.data));
     } else {
       maybe.add(JSON.stringify(datum.data));
     }
   });
-}
+};
 
 let args = argv.slice(2);
 
@@ -27,15 +27,15 @@ if (args[0] === '-v') {
   args.shift();
 }
 
-let [ url, ...files ] = args;
+let [url, ...files] = args;
 
 const expected = new Set();
 const maybe = new Set();
 
-files.forEach(file => loadExpected(file, expected, maybe));
+files.forEach((file) => loadExpected(file, expected, maybe));
 
-const everything = await fetchWithCookies(`${url}/`).then(r => r.json());
-const actual = new Set(everything.map(x  => JSON.stringify(x)));
+const everything = await fetchWithCookies(`${url}/`).then((r) => r.json());
+const actual = new Set(everything.map((x) => JSON.stringify(x)));
 
 let expectedPresent = 0;
 let maybePresent = 0;
