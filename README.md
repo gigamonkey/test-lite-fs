@@ -52,7 +52,11 @@ take over as the primary and we (mostly) won’t lose any data.
 
 ## Some assumptions
 
-- A fly machine stops as soon as the process it is running exits. (Technically I
-  guess the LiteFS proxy is really the main process so maybe if my server exits
-  the LiteFS proxy can still do stuff. Which would actually be good but means I
-  can’t easily simulate crash of the fly machine by just exiting my server.)
+- ~~A fly machine stops as soon as the process it is running exits. (Technically
+  I guess the LiteFS proxy is really the main process so maybe if my server
+  exits the LiteFS proxy can still do stuff. Which would actually be good but
+  means I can’t easily simulate crash of the fly machine by just exiting my
+  server.)~~ It seems that the Fly Machine runner keeps the machine alive and
+  just restarts the process, which makes sense. I guess that's fine for my
+  purposes. Again, not sure yet what happens when the LiteFS proxy gets added to
+  the mix.
