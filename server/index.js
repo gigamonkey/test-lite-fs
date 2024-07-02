@@ -1,13 +1,24 @@
 import 'dotenv/config';
 
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { DB } from 'pugsql';
 
 const db = new DB(process.env.DATABASE_URL, 'schema.sql').addQueries('queries.sql');
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  var cookie = req.cookies.gigamonkeyCookie;
+  if (cookie === undefined) {
+    const value = Math.random().toString(16);
+    res.cookie('gigamonkeyCookie', value, { maxAge: 900000, httpOnly: true });
+  }
+  next();
+});
 
 app.get('/', async (req, res) => {
   res.send('hello');
@@ -22,6 +33,7 @@ app.get('/me', (req, res) => {
 });
 
 app.post('/',  (req, res) => {
+
   console.log(req.body);
   db.insertStuff(req.body);
   if (Math.random() < 0.1) {
