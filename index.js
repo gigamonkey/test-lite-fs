@@ -3,7 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import { DB } from 'pugsql';
 
-const db = new DB('db.db', 'schema.sql').addQueries('queries.sql');
+const db = new DB(process.env.DATABASE_URL, 'schema.sql').addQueries('queries.sql');
 const app = express();
 
 app.use(express.json());
