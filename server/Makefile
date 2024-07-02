@@ -11,8 +11,12 @@ serve: .env
 docker:
 	docker build . -t test-lite-fs
 
-deploy: fly.env fly.toml
-	fly deploy --build-arg GIT_STATUS="$(shell ./gitenv.sh)"
+deploy: fly.toml .secrets-set
+	fly deploy
+
+.secrets-set:
+	fly secrets set --stage PORT=3000
+	touch $@
 
 run_docker:
 	docker run --env PORT=9000 --name test-lite-fs -d -p 9000:9000 test-lite-fs
@@ -30,6 +34,7 @@ pretty:
 	prettier -w **/*.js *.sql public/**/*.css
 
 clean:
+	rm -f .secrets-set
 
 clean_db:
 	rm -f db.db*

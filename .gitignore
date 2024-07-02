@@ -2,3 +2,4 @@
 !template.env
 db.db*
 node_modules/
+.secrets-set
