@@ -2,18 +2,28 @@ import { argv } from 'process';
 import { CookieJar } from 'tough-cookie';
 import fetchCookie from 'fetch-cookie';
 import now from 'performance-now';
+import fs from 'fs';
 
 const cookies = new CookieJar();
 const fetchWithCookies = fetchCookie(fetch, cookies);
 
 const requests = [];
 
-const timedFetch = async (...args) => {
+/**
+ * Add stuff to the database and keep track of what we've done, how long it
+ * took, and whether it seems to have succeeded.
+ */
+const addStuff = async (tag, number) => {
   const start = now();
   let ok = true;
   let status = undefined;
+  const data = { tag, number };
   try {
-    const r = await fetchWithCookies(...args);
+    const r = await fetchWithCookies(url, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
     status = r.status;
     return r;
   } catch (e) {
@@ -21,18 +31,8 @@ const timedFetch = async (...args) => {
     return undefined;
   } finally {
     const ms = now() - start;
-    requests.push({ ms, ok, status });
+    requests.push({ data, ms, ok, status });
   }
-};
-
-const addStuff = async (tag, number) => {
-  return timedFetch(url, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({tag, number}),
-  });
 };
 
 const getMe = async (tag) => {
@@ -57,7 +57,7 @@ delay = Number(delay);
 
 const start = await getMe(tag).then(r => r.json());
 
-console.log(start);
+console.log(`Starting at: ${JSON.stringify(start)}`);
 
 const offset = start.max + 1;
 
@@ -68,15 +68,19 @@ const busywait = (ms) => {
 
 for (let i = 0; i < num; i++) {
   const r = await addStuff(tag, i + offset);
+  process.stdout.write('.');
+  if (i !== 0 && i % 60 === 0) process.stdout.write('\n');
   if (delay > 0) busywait(delay);
 }
+process.stdout.write('\n');
 
 try {
-  console.log(await getMe('a').then(r => r?.json()));
+  const end = await getMe('a').then(r => r.json());
+  console.log(`Ending at: ${JSON.stringify(end)}`);
 } catch {
   console.log('Problem at end');
 }
 
 //dumpCookies();
 
-requests.forEach(r => console.log(JSON.stringify(r)));
+fs.writeFileSync(`client-${tag}-${offset}-${(offset+num) - 1}.json`, JSON.stringify(requests, null, 2));
