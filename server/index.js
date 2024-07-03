@@ -51,6 +51,19 @@ app.post('/', (req, res) => {
   }
 });
 
+app.get('/always-write/:tag/:number', async (req, res) => {
+  db.insertStuff(req.params);
+  if (Math.random() < probability500) {
+    console.log(`Sending 500 after saving ${JSON.stringify(req.body)}`);
+    res.status(500).send('Ooops!');
+  } else if (Math.random() < probabilityExit) {
+    console.log(`Crashing after saving ${JSON.stringify(req.body)}`);
+    process.exit(1);
+  } else {
+    res.json(req.body);
+  }
+});
+
 app.get('/me', (req, res) => {
   res.json(db.me(req.query));
 });

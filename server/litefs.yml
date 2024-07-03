@@ -26,6 +26,9 @@ proxy:
   passthrough:
     - "*.ico"
     - "*.png"
+  always-forward:
+    - "^/always-write"
+
 
 # This section defines a list of commands to run after LiteFS has connected
 # and sync'd with the cluster. You can run multiple commands but LiteFS expects

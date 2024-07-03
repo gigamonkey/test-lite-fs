@@ -25,15 +25,16 @@ const addStuff = async (tag, number) => {
   let status = undefined;
   const data = { tag, number };
   try {
-    const r = await fetchWithCookies(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    // const r = await fetchWithCookies(url, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data),
+    // });
+    const r = await fetchWithCookies(`${url}/always-write/${tag}/${number}`);
     status = r.status;
     return true;
   } catch (e) {
-    //console.log(e);
+    console.log(e);
     ok = false;
     return false;
   } finally {
