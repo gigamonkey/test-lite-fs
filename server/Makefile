@@ -16,6 +16,7 @@ deploy: fly.toml .secrets-set
 
 .secrets-set:
 	fly secrets set --stage PORT=3000
+	fly secrets set --stage LITEFS_CLOUD_TOKEN="$(cat litefs.token)"
 	touch $@
 
 run_docker:
