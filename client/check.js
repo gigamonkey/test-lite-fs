@@ -7,13 +7,19 @@ import fs from 'fs';
 const cookies = new CookieJar();
 const fetchWithCookies = fetchCookie(fetch, cookies);
 
-const loadExpected = (file, expected, maybe) => {
+const loadClientLog = (file, summary) => {
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-  data.forEach((datum) => {
-    if (datum.ok) {
-      expected.add(JSON.stringify(datum.data));
+  data.forEach(({data, ms, ok, status}) => {
+    summary.requests++;
+    summary.totalMillis += ms;
+    summary.times.push(ms);
+    if (ok) {
+      summary.successes++;
+      summary.totalOkMillis += ms;
+      summary.expected.add(JSON.stringify(data));
     } else {
-      maybe.add(JSON.stringify(datum.data));
+      summary.totalNotOKMillis += ms;
+      summary.maybe.add(JSON.stringify(data));
     }
   });
 };
@@ -29,10 +35,21 @@ if (args[0] === '-v') {
 
 let [url, ...files] = args;
 
-const expected = new Set();
-const maybe = new Set();
+const summary = {
+  requests: 0,
+  expected: new Set(),
+  maybe: new Set(),
+  successes: 0,
+  totalMillis: 0,
+  totalOkMillis: 0,
+  totalNotOkMillis: 0,
+  times: [],
+};
 
-files.forEach((file) => loadExpected(file, expected, maybe));
+files.forEach((file) => loadClientLog(file, summary));
+
+
+
 
 const everything = await fetchWithCookies(`${url}/`).then((r) => r.json());
 const actual = new Set(everything.map((x) => JSON.stringify(x)));
@@ -40,7 +57,7 @@ const actual = new Set(everything.map((x) => JSON.stringify(x)));
 let expectedPresent = 0;
 let maybePresent = 0;
 
-for (const e of expected) {
+for (const e of summary.expected) {
   if (actual.has(e)) {
     expectedPresent++;
     if (verbose) {
@@ -53,7 +70,7 @@ for (const e of expected) {
   }
 }
 
-for (const e of maybe) {
+for (const e of summary.maybe) {
   if (actual.has(e)) {
     maybePresent++;
     if (verbose) {
@@ -62,5 +79,12 @@ for (const e of maybe) {
   }
 }
 
-console.log(`expected present: ${expectedPresent} of ${expected.size}`);
-console.log(`mabye present: ${maybePresent} of ${maybe.size}`);
+console.log(`expected present: ${expectedPresent} of ${summary.expected.size}`);
+console.log(`maybe present: ${maybePresent} of ${summary.maybe.size}`);
+console.log(`requests: ${summary.requests}`);
+console.log(`success rate: ${summary.successes / summary.requests}`);
+console.log(`avg ms: ${summary.totalMillis / summary.requests}`);
+console.log(`avg ok ms: ${summary.totalOkMillis / summary.successes}`);
+console.log(`avg not ok ms: ${summary.totalNotOkMillis / (summary.requests - summary.successes)}`);
+console.log(`p50: ${summary.times.sort()[Math.floor(summary.times.length * 0.5)]}`);
+console.log(`p95: ${summary.times.sort()[Math.floor(summary.times.length * 0.95)]}`);
