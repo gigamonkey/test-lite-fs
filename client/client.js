@@ -31,11 +31,11 @@ const addStuff = async (tag, number) => {
       body: JSON.stringify(data),
     });
     status = r.status;
-    return r;
+    return true;
   } catch (e) {
-    console.log(e);
+    //console.log(e);
     ok = false;
-    return undefined;
+    return false;
   } finally {
     const ms = now() - start;
     requests.push({ data, ms, ok, status });
@@ -77,8 +77,8 @@ try {
     const offset = start.max + 1;
 
     for (let i = 0; i < num; i++) {
-      const r = await addStuff(tag, i + offset);
-      process.stdout.write('.');
+      const ok = await addStuff(tag, i + offset);
+      process.stdout.write(ok ? '.' : 'X');
       if (i % 60 === 59) process.stdout.write('\n');
       if (delay > 0) busywait(delay);
     }
