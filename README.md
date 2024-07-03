@@ -4,22 +4,42 @@
 
 - If the primary crashes does the secondary seamlessly take over as primary?
 
+  *Yes. The key thing seems to be that (perhaps obviously in retrospect) the
+  secondary has to be already started. I.e. you can't count on fly to start a
+  stopped machine to take over because that machine won't have been getting synced
+  with the primary. But if another machine is up and part of the LiteFS cluster it
+  appears it will just take over, no problem.*
+
 - How quickly? Do clients get slower responses or any failed/timedout responses?
   (I guess if we have the server exit before sending the response, there will be
   at least some failed requests, but technically the data should be stored
   before each crash.)
 
+  *Weirdly I didn't get any failed HTTP requests even when a machine crashed
+  before sending a response. I can only assume that that's because the LiteFS
+  http proxy sent a 200 response. But that seems a bit odd.*
+
 - Do readers always see up to date data, meaning, if they read do they see a) at
   least everything they've written and b) everything they've read before.
+
+  *I don't see any evidence that they don't. I haven't tested this is carefully;
+  most of my tests were shaped like write a bunch of stuff with some
+  intermittent crashes or machine stops and then checking that everything was
+  there at the end.*
 
 - Assuming readers do only see up to date data, does that ever introduce
   noticible latency on their requests. (My understanding is that the LiteFS
   proxy holds up the request until the node handling the request's TXID is at
   least as high as the one in the client
 
+  *Haven't really tested this yet. Need to do a read heavy test while writes are
+  going on.*
+
 - Does the configuration option discussed here
   https://community.fly.io/t/litefs-http-proxy-failing-with-nextauth/15917/3
   actually work to make some GET requests get routed to the primary.
+
+  *Not tested at all yet.*
 
 ## Basic client plan
 
