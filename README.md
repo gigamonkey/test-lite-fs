@@ -15,9 +15,7 @@
   at least some failed requests, but technically the data should be stored
   before each crash.)
 
-  *Weirdly I didn't get any failed HTTP requests even when a machine crashed
-  before sending a response. I can only assume that that's because the LiteFS
-  http proxy sent a 200 response. But that seems a bit odd.*
+  *When my server process exits the LiteFS proxy sends a 502 response*
 
 - Do readers always see up to date data, meaning, if they read do they see a) at
   least everything they've written and b) everything they've read before.
