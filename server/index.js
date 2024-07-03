@@ -1,12 +1,20 @@
 import 'dotenv/config';
 
 import express from 'express';
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { DB } from 'pugsql';
 import fs from 'fs';
 
 const probability500 = 0.0;
-const probabilityExit = 0.05;
+
+// When this is zero things seem to work fine: writes go to the primary and
+// reads go to either node and they agree on what's been written. However when I
+// set this to, say, 0.05 we lose a fair bit of data. Which is maybe what we
+// should expect. I was kind of hoping the LiteFS proxy would note that the
+// subprocess had exited but somehow ensure that the latest writes had been sent
+// out to other nodes before it exited and let theh machine restart.
+const probabilityExit = 0.0;
 
 const args = process.argv.slice(2);
 
@@ -17,6 +25,7 @@ const db = new DB(dbfile, 'schema.sql').addQueries('queries.sql');
 const app = express();
 
 app.use(express.json());
+app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
