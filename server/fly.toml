@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for gigamonkey-test-lite-fs on 2024-07-02T09:35:07-07:00
+# fly.toml app configuration file generated for gigamonkey-test-lite-fs-purple-fog-4934 on 2024-07-02T18:15:09-07:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -8,17 +8,18 @@ primary_region = "sjc"
 
 [build]
 
+[mounts]
+  source = "litefs"
+  destination = "/var/lib/litefs"
+  auto_extend_size_threshold = 0
+
 [http_service]
-  internal_port = 3000
+  internal_port = 8080
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 2
   processes = ["app"]
-
-[mounts]
-  source = "gtlfs"
-  destination = "/data"
 
 [[vm]]
   cpu_kind = "shared"

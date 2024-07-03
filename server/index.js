@@ -3,8 +3,17 @@ import 'dotenv/config';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { DB } from 'pugsql';
+import fs from 'fs';
 
-const db = new DB(process.env.DATABASE_URL, 'schema.sql').addQueries('queries.sql');
+const probability500 = 0.0;
+const probabilityExit = 0.05;
+
+const args = process.argv.slice(2);
+
+const port = Number(args[0]);
+const dbfile = args[1];
+
+const db = new DB(dbfile, 'schema.sql').addQueries('queries.sql');
 const app = express();
 
 app.use(express.json());
@@ -24,21 +33,21 @@ app.get('/', async (req, res) => {
   res.json(db.stuff());
 });
 
-app.get('/me', (req, res) => {
-  res.json(db.me(req.query));
-});
-
 app.post('/', (req, res) => {
   db.insertStuff(req.body);
-  if (Math.random() < 0.1) {
+  if (Math.random() < probability500) {
     console.log(`Sending 500 after saving ${JSON.stringify(req.body)}`);
     res.status(500).send('Ooops!');
-  } else if (Math.random() < 0.1) {
+  } else if (Math.random() < probabilityExit) {
     console.log(`Crashing after saving ${JSON.stringify(req.body)}`);
     process.exit(1);
   } else {
     res.json(req.body);
   }
+});
+
+app.get('/me', (req, res) => {
+  res.json(db.me(req.query));
 });
 
 const line = '********************************************************************************';
@@ -61,6 +70,5 @@ if (process.env.DUMP_ROUTES) {
   fs.writeFileSync('routes.txt', dumpEndpoints().join('\n'));
 }
 
-const port = Number(process.env.PORT);
 
 app.listen(port, () => console.log(`App is listening on port ${port}\n${line}\n`));

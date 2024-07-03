@@ -27,9 +27,16 @@ RUN npm ci
 # Copy application code
 COPY --link . .
 
-
 # Final stage for app image
 FROM base
+
+RUN apt-get update -y && \
+    apt-get install -y \
+    ca-certificates \
+    fuse3 \
+    sqlite3
+
+COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
 
 ARG PORT
 
@@ -45,4 +52,5 @@ ENV PORT=${PORT}
 ENV DATABASE_URL="/data/db.db"
 
 # Start the server by default, this can be overwritten at runtime
-CMD [ "node", "index.js" ]
+#CMD [ "node", "index.js" ]
+ENTRYPOINT litefs mount
