@@ -4,6 +4,12 @@ import fetchCookie from 'fetch-cookie';
 import now from 'performance-now';
 import fs from 'fs';
 
+/*
+ * Client tester that spams the server with a bunch of new data and keeps track
+ * of what requests it made and whether they succeeded so we can later compare
+ * what's in the database with what we expect to be there.
+ */
+
 const cookies = new CookieJar();
 const fetchWithCookies = fetchCookie(fetch, cookies);
 
@@ -55,7 +61,10 @@ let [url, tag, num, delay] = argv.slice(2);
 num = Number(num);
 delay = Number(delay ?? 0);
 
-console.log(`num: ${num}; delay: ${delay}`);
+const busywait = (ms) => {
+  const start = now();
+  while (now() - start < ms);
+};
 
 try {
   const r = await getMe(tag);
@@ -67,15 +76,10 @@ try {
 
     const offset = start.max + 1;
 
-    const busywait = (ms) => {
-      const start = now();
-      while (now() - start < ms);
-    };
-
     for (let i = 0; i < num; i++) {
       const r = await addStuff(tag, i + offset);
       process.stdout.write('.');
-      if (i !== 0 && i % 60 === 0) process.stdout.write('\n');
+      if (i % 60 === 59) process.stdout.write('\n');
       if (delay > 0) busywait(delay);
     }
     process.stdout.write('\n');
@@ -86,8 +90,6 @@ try {
     } catch {
       console.log('Problem at end');
     }
-
-    //dumpCookies();
 
     fs.writeFileSync(
       `client-${tag}-${offset}-${offset + num - 1}.json`,
