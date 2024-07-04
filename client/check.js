@@ -13,7 +13,7 @@ const loadClientLog = (file, summary) => {
     summary.requests++;
     summary.totalMillis += ms;
     summary.times.push(ms);
-    if (ok) {
+    if (ok && status === 200) {
       summary.successes++;
       summary.totalOkMillis += ms;
       summary.expected.add(JSON.stringify(data));

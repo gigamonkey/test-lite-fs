@@ -21,26 +21,33 @@ const requests = [];
  */
 const addStuff = async (tag, number) => {
   const start = now();
-  let ok = true;
+
+  let ok = undefined;
+  let err = undefined;
   let status = undefined;
+
   const data = { tag, number };
+
   try {
     // const r = await fetchWithCookies(url, {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
     //   body: JSON.stringify(data),
     // });
+
+    // Testing the always-forward config.
     const r = await fetchWithCookies(`${url}/always-write/${tag}/${number}`);
     status = r.status;
-    return true;
+    ok = status === 200;
   } catch (e) {
-    console.log(e);
+    err = e;
     ok = false;
-    return false;
   } finally {
     const ms = now() - start;
-    requests.push({ data, ms, ok, status });
+    requests.push({ data, ms, ok, status, err });
   }
+
+  return ok;
 };
 
 const getMe = async (tag) => {

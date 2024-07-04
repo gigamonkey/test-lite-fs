@@ -4,4 +4,5 @@ db.db*
 node_modules/
 .secrets-set
 client/client-*.json
+client/*logs.txt
 *.token
